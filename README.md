@@ -1,14 +1,16 @@
-# room-migration-matrix
+# Android Room Migration Test Matrix Generator
 
-Generate Android `MigrationTestHelper` tests for every forward pair of exported Room schema versions. The tool checks graph reachability first, so a missing route fails generation instead of silently leaving an upgrade path untested.
+Generate Kotlin instrumentation-test code for every forward upgrade path between exported Android Room schema versions. `room-migration-matrix` reads Room schema JSON and an explicit migration graph, checks reachability, and writes a helper that runs those paths with Room's `MigrationTestHelper`.
 
-## Why
+Use it to keep migration-path coverage aligned with the schema versions your app ships. It complements Room's migration tools; it does not replace Room's migration engine.
 
-Room exports each database schema version as JSON, but teams still have to keep migration test cases in sync with those exports and their migration objects. This tool reads the exported versions plus an explicit migration manifest, finds a deterministic shortest path for each old-to-new pair, and writes a compilable Kotlin helper function.
+## Install and generate a matrix
 
-## Install and use
+Requires Python 3.10 or newer. Install from a checkout:
 
 ```sh
+git clone https://github.com/buxerr/room-migration-matrix.git
+cd room-migration-matrix
 python -m pip install .
 room-migration-matrix \
   --schemas app/schemas \
@@ -18,7 +20,7 @@ room-migration-matrix \
   --report build/migration-matrix.json
 ```
 
-`migration-edges.json` maps each supported Room version edge to the Kotlin expression for that migration instance:
+The migration manifest maps each version edge to the Kotlin expression for its migration object:
 
 ```json
 {
@@ -30,16 +32,20 @@ room-migration-matrix \
 }
 ```
 
-The generated file defines `runGeneratedMigrationMatrix(migrationTestHelper)`. Call it from an Android instrumented test that owns a `MigrationTestHelper`; add `--migration-import` for each migration object outside the generated file's package. The helper must load the same exported schema directory used by the app. The generated `createDatabase` and `runMigrationsAndValidate` calls use unique database names for each source/target pair.
+The generated Kotlin defines `runGeneratedMigrationMatrix(migrationTestHelper)`. Call it from an Android instrumented test that owns a `MigrationTestHelper`. Add `--migration-import` for migration objects outside the generated file's package, and configure the helper to load the same exported schemas as the app.
 
-This checks path coverage and Room's schema validation. It cannot prove data-preservation behavior; add assertions for important transformed rows to migration tests for those paths. It currently generates upward paths only; Room downgrade behavior needs a separate explicit policy.
+## What the matrix verifies
 
-## Development
+The generator finds a deterministic shortest route for each old-to-new version pair. A missing route fails generation instead of silently leaving that pair untested. Each generated path uses unique database names and Room's schema validation.
 
-```sh
-PYTHONPATH=src python -m unittest discover -s tests -v
-```
+See the [Room migration testing documentation](https://developer.android.com/training/data-storage/room/migrating-db-versions.html) for the underlying helper and migration APIs.
 
-Install the CLI with `python -m pip install .` in a normal Python environment.
+## Scope and limitations
 
-Python 3.10+; runtime has no third-party dependencies. MIT licensed.
+Schema validation does not prove that application data was preserved or transformed correctly. Add row-level assertions for important data changes. This tool generates forward paths only; downgrade testing requires a separate app policy.
+
+Run the Python unit suite with `PYTHONPATH=src python -m unittest discover -s tests -v`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
