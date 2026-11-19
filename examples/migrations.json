@@ -1,0 +1,5 @@
+{
+  "migrations": [
+    { "from": 1, "to": 2, "symbol": "MIGRATION_1_2" }
+  ]
+}

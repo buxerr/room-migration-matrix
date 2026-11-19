@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "room-migration-matrix"
+version = "0.1.0"
+description = "Generate complete Room MigrationTestHelper path coverage from exported schemas."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "buxerr" }]
+dependencies = []
+
+[project.scripts]
+room-migration-matrix = "room_migration_matrix.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
