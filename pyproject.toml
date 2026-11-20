@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,9 +8,15 @@ version = "0.1.0"
 description = "Generate complete Room MigrationTestHelper path coverage from exported schemas."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["android-room", "room-migration", "migration-testing", "kotlin", "schema-export", "instrumentation-test", "test-generation"]
 authors = [{ name = "buxerr" }]
 dependencies = []
+
+[project.urls]
+Repository = "https://github.com/buxerr/room-migration-matrix"
+Issues = "https://github.com/buxerr/room-migration-matrix/issues"
 
 [project.scripts]
 room-migration-matrix = "room_migration_matrix.cli:main"
